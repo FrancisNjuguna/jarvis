@@ -1,16 +1,14 @@
+import json
 import speech_recognition as sr
 import pyttsx3
 
-# Initialize the recognizer and engine
 r = sr.Recognizer()
 engine = pyttsx3.init()
 
-# Define a function for speaking
 def speak(text):
     engine.say(text)
     engine.runAndWait()
 
-# Define a function for listening
 def listen():
     with sr.Microphone() as source:
         print("Listening...")
@@ -21,22 +19,22 @@ def listen():
             return text.lower()
         except sr.UnknownValueError:
             print("Sorry, I did not understand.")
+            return ""
         except sr.RequestError:
             print("Sorry, my speech service is currently down.")
+            return ""
 
-# Define your voice assistant's behavior
-def assistant():
-    speak("Hello, I'm your voice assistant. How can I help you?")
-    while True:
-        command = listen()
-        if "hello" in command:
-            speak("Hello there!")
-        elif "goodbye" in command:
-            speak("Goodbye!")
-            break
-        else:
-            speak("Sorry, I did not understand.")
+def assistant(request):
+    data = json.loads(request)
+    command = data.get("command", "").lower()
+    if "hello" in command:
+        return "Hello there!"
+    elif "goodbye" in command:
+        return "Goodbye!"
+    else:
+        return "Sorry, I did not understand."
 
-# Start the voice assistant
-assistant()
-
+if __name__ == "__main__":
+    request = input()
+    response = assistant(request)
+    print(response)
